@@ -24,7 +24,7 @@ A conversational AI chatbot that helps users find and book flights and hotels fo
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/TravelAgencyChatBot.git
+git clone https://github.com/AbhishekMZ/TravelAgencyChatBot.git
 cd TravelAgencyChatBot
 ```
 
