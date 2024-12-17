@@ -1,111 +1,158 @@
-# India Travel Chatbot
+# Travel Agency Chatbot
 
-An intelligent chatbot specialized in Indian travel assistance, providing hotel recommendations, cultural insights, and travel planning help.
+A conversational AI chatbot that helps users find and book flights and hotels for their travel plans.
 
 ## Features
 
-### Hotel Recommendations
-- Personalized hotel suggestions based on:
-  - City preferences
-  - Budget categories (luxury, mid-range, budget)
-  - Peak season awareness
-  - Nearby attractions
-  - Festival considerations
+- Natural language conversation for travel planning
+- Flight search and recommendations
+- Hotel recommendations based on budget
+- Multi-step conversation flow with context management
+- Error handling and graceful fallbacks
+- Seamless integration between flight and hotel bookings
+- Detailed summaries of travel options
+- Easy conversation reset with 'start over' command
 
-### Travel Information
-- Comprehensive city guides
-- Festival and event information
-- Weather-aware recommendations
-- Local attraction details
-- Cultural insights
+## Getting Started
 
-### Smart Context Handling
-- Budget-aware suggestions
-- Seasonal considerations
-- Festival period adjustments
-- Location-specific tips
+### Prerequisites
 
-## Setup
+- Python 3.8 or higher
+- pip package manager
+- Virtual environment (recommended)
 
-1. Install dependencies:
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/TravelAgencyChatBot.git
+cd TravelAgencyChatBot
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows, use: .venv\Scripts\activate
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Download spaCy model:
+### Running the Application
+
+1. Start the Flask server:
 ```bash
-python -m spacy download en_core_web_sm
+python app.py
 ```
 
-3. Ensure all data files are present:
-- india_cities.json
-- india_festivals.json
-- india_travel_data.csv
-- india_travel_intents.json
-
-## Usage
-
-Run the chatbot:
-```bash
-python src/chat_endpoint.py
+2. Open your browser and navigate to:
+```
+http://localhost:5000
 ```
 
-### Example Queries
+## Usage Guide
 
-1. Hotel Search:
-   - "Show me luxury hotels in Mumbai"
-   - "Find budget hotels in Delhi near Red Fort"
-   - "Hotels in Jaipur during Diwali"
+The chatbot follows a structured conversation flow:
 
-2. Travel Information:
-   - "What's the best time to visit Kerala?"
-   - "Tell me about festivals in Rajasthan"
-   - "Popular attractions in Agra"
+1. **Greeting**: Start with a simple greeting (hi, hello, hey, etc.)
+2. **Destination**: Enter your desired city (currently supports Mumbai, Delhi, Bangalore)
+3. **Travel Date**: Specify when you want to travel
+4. **Service Selection**: Choose between flights (1) or hotels (2)
+5. **Budget**: For hotels, specify your per-night budget in Rs.
+6. **Results**: View available options with prices and details
+7. **Booking**: Contact the travel desk using the provided email for bookings
 
-## Data Structure
+At any point in the conversation, you can type 'start over' to begin a new search.
 
-The chatbot uses several JSON files for structured data:
+### Example Conversation
 
-1. `india_cities.json`: City-specific information including:
-   - Hotels by category
-   - Local attractions
-   - Transportation options
-   - Weather patterns
+```
+User: Hi
+Bot: Hello! Where would you like to travel?
 
-2. `india_festivals.json`: Festival and seasonal information:
-   - Major festivals
-   - Peak seasons
-   - Travel tips
-   - Cultural events
+User: Mumbai
+Bot: Great! When would you like to travel?
 
-3. `india_travel_intents.json`: Conversation patterns:
-   - User intents
-   - Response templates
-   - Query patterns
+User: next week
+Bot: What would you like to know about?
+1. Flights
+2. Hotels
 
-## Customization
+User: 1
+Bot: [Shows available flights]
+Would you also like to check hotels? What's your budget per night? (in Rs.)
 
-You can extend the chatbot's knowledge by:
-1. Adding new cities to `india_cities.json`
-2. Including more festivals in `india_festivals.json`
-3. Expanding travel patterns in `india_travel_intents.json`
+User: start over
+Bot: Let's start a new search! Where would you like to travel?
+```
 
-## Dependencies
+### Start Over Feature
 
-- Python 3.8+
-- spaCy
-- pandas
-- dateparser
-- requests
+The chatbot includes a convenient "start over" feature that allows users to:
+- Reset the current conversation at any point
+- Clear all previous context and history
+- Start a fresh search immediately
+- Maintain a clean state for accurate recommendations
+
+You can trigger this feature by typing:
+- "start over"
+- "restart"
+- "new search"
+
+## Project Structure
+
+```
+TravelAgencyChatBot/
+├── app.py                 # Flask application entry point
+├── requirements.txt       # Python dependencies
+├── src/
+│   ├── chat_endpoint.py   # Main chatbot logic
+│   ├── chat_history.py    # Conversation context management
+│   ├── flight_service.py  # Flight search functionality
+│   └── hotel_recommender.py # Hotel recommendation system
+├── data/                  # Sample data for flights and hotels
+├── static/               # Static assets (CSS, JS)
+├── templates/            # HTML templates
+└── tests/                # Unit tests
+```
+
+## Testing
+
+Run the test suite to verify functionality:
+
+```bash
+python -m unittest tests/test_chatbot.py -v
+```
+
+## Error Handling
+
+The chatbot includes robust error handling for:
+- Invalid cities
+- Invalid dates
+- Incorrect menu selections
+- Invalid budget inputs
+- Missing or incomplete information
 
 ## Contributing
 
-Feel free to contribute by:
-1. Adding more cities and hotels
-2. Improving response patterns
-3. Adding new features
-4. Enhancing cultural context
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
 
-MIT License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+For support or queries, contact: support@travelagency.com
+
+## Acknowledgments
+
+- Built with Flask and spaCy
+- Uses modern conversational UI principles
+- Implements best practices for chatbot development

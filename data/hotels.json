@@ -1,0 +1,123 @@
+{
+    "hotels": [
+        {
+            "name": "Taj Palace Mumbai",
+            "location": "mumbai",
+            "rating": 5.0,
+            "price": 15000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "The Oberoi Mumbai",
+            "location": "mumbai",
+            "rating": 5.0,
+            "price": 18000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "ITC Grand Central",
+            "location": "mumbai",
+            "rating": 4.5,
+            "price": 12000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "Trident Nariman Point",
+            "location": "mumbai",
+            "rating": 4.5,
+            "price": 10000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "Novotel Mumbai",
+            "location": "mumbai",
+            "rating": 4.0,
+            "price": 7000.0,
+            "category": "mid-range"
+        },
+        {
+            "name": "Courtyard by Marriott Mumbai",
+            "location": "mumbai",
+            "rating": 4.0,
+            "price": 6000.0,
+            "category": "mid-range"
+        },
+        {
+            "name": "Ramada Plaza Mumbai",
+            "location": "mumbai",
+            "rating": 3.5,
+            "price": 4500.0,
+            "category": "mid-range"
+        },
+        {
+            "name": "FabHotel Prime Mumbai",
+            "location": "mumbai",
+            "rating": 3.5,
+            "price": 3000.0,
+            "category": "budget"
+        },
+        {
+            "name": "Hotel Residency Mumbai",
+            "location": "mumbai",
+            "rating": 3.0,
+            "price": 2500.0,
+            "category": "budget"
+        },
+        {
+            "name": "The Taj Mahal Palace Delhi",
+            "location": "delhi",
+            "rating": 5.0,
+            "price": 16000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "The Imperial Delhi",
+            "location": "delhi",
+            "rating": 5.0,
+            "price": 15000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "The Leela Palace Delhi",
+            "location": "delhi",
+            "rating": 4.5,
+            "price": 13000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "Shangri-La Delhi",
+            "location": "delhi",
+            "rating": 4.5,
+            "price": 11000.0,
+            "category": "luxury"
+        },
+        {
+            "name": "Crowne Plaza Delhi",
+            "location": "delhi",
+            "rating": 4.0,
+            "price": 7500.0,
+            "category": "mid-range"
+        },
+        {
+            "name": "Radisson Blu Delhi",
+            "location": "delhi",
+            "rating": 4.0,
+            "price": 6500.0,
+            "category": "mid-range"
+        },
+        {
+            "name": "Country Inn Delhi",
+            "location": "delhi",
+            "rating": 3.5,
+            "price": 4000.0,
+            "category": "budget"
+        },
+        {
+            "name": "Hotel Classic Delhi",
+            "location": "delhi",
+            "rating": 3.0,
+            "price": 3000.0,
+            "category": "budget"
+        }
+    ]
+}

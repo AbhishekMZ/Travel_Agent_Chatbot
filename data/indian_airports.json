@@ -1,0 +1,152 @@
+{
+    "airports": {
+        "DEL": {
+            "name": "Indira Gandhi International Airport",
+            "city": "Delhi",
+            "code": "DEL",
+            "terminals": ["T1", "T2", "T3"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara", "Air Asia"],
+            "domestic_destinations": ["Mumbai", "Bangalore", "Chennai", "Kolkata", "Hyderabad"],
+            "international_sectors": ["Dubai", "London", "Singapore", "New York", "Bangkok"]
+        },
+        "BOM": {
+            "name": "Chhatrapati Shivaji Maharaj International Airport",
+            "city": "Mumbai",
+            "code": "BOM",
+            "terminals": ["T1", "T2"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara", "GoAir"],
+            "domestic_destinations": ["Delhi", "Bangalore", "Chennai", "Kolkata", "Hyderabad"],
+            "international_sectors": ["Dubai", "London", "Singapore", "New York", "Doha"]
+        },
+        "BLR": {
+            "name": "Kempegowda International Airport",
+            "city": "Bangalore",
+            "code": "BLR",
+            "terminals": ["T1", "T2"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara", "AirAsia"],
+            "domestic_destinations": ["Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad"],
+            "international_sectors": ["Dubai", "Singapore", "Bangkok", "Kuala Lumpur"]
+        },
+        "MAA": {
+            "name": "Chennai International Airport",
+            "city": "Chennai",
+            "code": "MAA",
+            "terminals": ["T1", "T3", "T4"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara", "AirAsia"],
+            "domestic_destinations": ["Delhi", "Mumbai", "Bangalore", "Kolkata", "Hyderabad"],
+            "international_sectors": ["Singapore", "Dubai", "Kuala Lumpur", "Colombo"]
+        },
+        "CCU": {
+            "name": "Netaji Subhas Chandra Bose International Airport",
+            "city": "Kolkata",
+            "code": "CCU",
+            "terminals": ["T2"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara", "GoAir"],
+            "domestic_destinations": ["Delhi", "Mumbai", "Bangalore", "Chennai", "Hyderabad"],
+            "international_sectors": ["Bangkok", "Singapore", "Dubai", "Dhaka"]
+        },
+        "HYD": {
+            "name": "Rajiv Gandhi International Airport",
+            "city": "Hyderabad",
+            "code": "HYD",
+            "terminals": ["T1"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara", "AirAsia"],
+            "domestic_destinations": ["Delhi", "Mumbai", "Bangalore", "Chennai", "Kolkata"],
+            "international_sectors": ["Dubai", "Singapore", "London", "Bangkok"]
+        },
+        "COK": {
+            "name": "Cochin International Airport",
+            "city": "Kochi",
+            "code": "COK",
+            "terminals": ["T1", "T3"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara"],
+            "domestic_destinations": ["Delhi", "Mumbai", "Bangalore", "Chennai"],
+            "international_sectors": ["Dubai", "Singapore", "Kuwait", "Doha"]
+        },
+        "JAI": {
+            "name": "Jaipur International Airport",
+            "city": "Jaipur",
+            "code": "JAI",
+            "terminals": ["T1", "T2"],
+            "airlines": ["Air India", "IndiGo", "SpiceJet", "Vistara"],
+            "domestic_destinations": ["Delhi", "Mumbai", "Bangalore", "Chennai"],
+            "international_sectors": ["Dubai", "Bangkok", "Singapore"]
+        }
+    },
+    "airlines": {
+        "Air India": {
+            "code": "AI",
+            "baggage_allowance": {
+                "domestic": {
+                    "economy": "25 kg",
+                    "business": "35 kg",
+                    "first": "40 kg"
+                },
+                "international": {
+                    "economy": "30 kg",
+                    "business": "40 kg",
+                    "first": "50 kg"
+                }
+            },
+            "classes": ["Economy", "Business", "First"]
+        },
+        "IndiGo": {
+            "code": "6E",
+            "baggage_allowance": {
+                "domestic": {
+                    "economy": "15 kg"
+                },
+                "international": {
+                    "economy": "20 kg"
+                }
+            },
+            "classes": ["Economy"]
+        },
+        "SpiceJet": {
+            "code": "SG",
+            "baggage_allowance": {
+                "domestic": {
+                    "economy": "15 kg"
+                },
+                "international": {
+                    "economy": "20 kg"
+                }
+            },
+            "classes": ["Economy"]
+        },
+        "Vistara": {
+            "code": "UK",
+            "baggage_allowance": {
+                "domestic": {
+                    "economy": "15 kg",
+                    "business": "30 kg"
+                },
+                "international": {
+                    "economy": "20 kg",
+                    "business": "35 kg"
+                }
+            },
+            "classes": ["Economy", "Business"]
+        }
+    },
+    "peak_seasons": {
+        "summer": {
+            "months": ["May", "June"],
+            "fare_increase": "30-40%"
+        },
+        "winter": {
+            "months": ["December", "January"],
+            "fare_increase": "25-35%"
+        },
+        "festivals": {
+            "diwali": {
+                "month": "October/November",
+                "fare_increase": "40-50%"
+            },
+            "christmas_newyear": {
+                "months": ["December", "January"],
+                "fare_increase": "45-55%"
+            }
+        }
+    }
+}

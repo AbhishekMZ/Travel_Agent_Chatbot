@@ -1,0 +1,86 @@
+{
+    "cities": {
+        "Delhi": {
+            "airports": ["Indira Gandhi International Airport (DEL)"],
+            "attractions": ["Red Fort", "Qutub Minar", "Humayun's Tomb", "India Gate", "Lotus Temple", "Akshardham Temple", "Chandni Chowk", "Connaught Place"],
+            "hotels": {
+                "luxury": ["The Oberoi", "Taj Palace", "ITC Maurya", "The Imperial", "Leela Palace", "Roseate House"],
+                "mid_range": ["The Metropolitan", "The Claridges", "The Park", "Crowne Plaza", "Pride Plaza", "Lemon Tree"],
+                "budget": ["Bloom Rooms", "FabHotel", "OYO Rooms", "Hotel Palace Heights", "Hotel City Star"]
+            }            
+        },
+        "Mumbai": {
+            "airports": ["Chhatrapati Shivaji Maharaj International Airport (BOM)"],
+            "attractions": ["Gateway of India", "Marine Drive", "Colaba", "Elephanta Caves", "Juhu Beach", "Haji Ali", "Siddhivinayak Temple"],
+            "hotels": {
+                "luxury": ["The Taj Mahal Palace", "The Oberoi Mumbai", "Four Seasons", "St. Regis", "Trident Nariman Point"],
+                "mid_range": ["Trident Nariman Point", "ITC Grand Central", "The Fern", "Sahara Star", "The Orchid"],
+                "budget": ["Hotel Residency", "FabHotel", "Treebo", "Hotel Suba Palace"]
+            }
+            
+        },
+        "Bangalore": {
+            "airports": ["Kempegowda International Airport (BLR)"],
+            "attractions": ["Lalbagh Botanical Garden", "Cubbon Park", "MG Road", "Bangalore Palace", "ISKCON Temple", "Wonderla"],
+            "hotels": {
+                "luxury": ["The Leela Palace", "Taj West End", "ITC Gardenia", "The Ritz-Carlton", "JW Marriott"],
+                "mid_range": ["Ibis", "Novotel", "Lemon Tree", "Royal Orchid", "The Pride"],
+                "budget": ["FabHotel", "Treebo", "OYO Townhouse", "Ginger Hotels"]
+            }
+        },
+        "Hyderabad": {
+            "airports": ["Rajiv Gandhi International Airport (HYD)"],
+            "attractions": ["Charminar", "Golconda Fort", "Hussain Sagar", "Ramoji Film City", "Salar Jung Museum"],
+            "hotels": {
+                "luxury": ["Taj Falaknuma Palace", "ITC Kohenur", "Park Hyatt", "Trident"],
+                "mid_range": ["Novotel", "Westin", "Radisson Blu", "The Park"],
+                "budget": ["FabHotel", "OYO Rooms", "Treebo", "Ginger"]
+            }
+        },
+        "Chennai": {
+            "airports": ["Chennai International Airport (MAA)"],
+            "attractions": ["Marina Beach", "Kapaleeshwarar Temple", "Fort St. George", "San Thome Basilica"],
+            "hotels": {
+                "luxury": ["ITC Grand Chola", "The Leela Palace", "Taj Coromandel", "Park Hyatt"],
+                "mid_range": ["Trident", "Crowne Plaza", "The Residency", "GRT Grand"],
+                "budget": ["FabHotel", "Treebo", "OYO Rooms", "Ginger"]
+            }
+        },
+        "Kolkata": {
+            "airports": ["Netaji Subhas Chandra Bose International Airport (CCU)"],
+            "attractions": ["Victoria Memorial", "Howrah Bridge", "Park Street", "Dakshineswar Temple"],
+            "hotels": {
+                "luxury": ["The Oberoi Grand", "ITC Royal Bengal", "Taj Bengal", "The Park"],
+                "mid_range": ["Novotel", "Hyatt Regency", "Pride Plaza", "Lemon Tree"],
+                "budget": ["FabHotel", "OYO Rooms", "Treebo", "Hotel Lindsay"]
+            }
+        },
+        "Jaipur": {
+            "airports": ["Jaipur International Airport (JAI)"],
+            "attractions": ["Amber Fort", "Hawa Mahal", "City Palace", "Jantar Mantar", "Nahargarh Fort"],
+            "hotels": {
+                "luxury": ["Rambagh Palace", "Raj Palace", "ITC Rajputana", "Oberoi Rajvilas"],
+                "mid_range": ["Holiday Inn", "Marriott", "Hilton", "Radisson"],
+                "budget": ["Hotel Pearl Palace", "Zostel", "Moustache", "Treebo"]
+            }
+        },
+        "Agra": {
+            "airports": ["Agra Airport (AGR)"],
+            "attractions": ["Taj Mahal", "Agra Fort", "Fatehpur Sikri", "Akbar's Tomb", "Mehtab Bagh"],
+            "hotels": {
+                "luxury": ["The Oberoi Amarvilas", "ITC Mughal", "Taj Hotel & Convention Centre"],
+                "mid_range": ["Crystal Sarovar", "Howard Plaza", "Ramada Plaza"],
+                "budget": ["Hotel Sidhartha", "Hotel Atulyaa Taj", "Tourist Rest House"]
+            }
+        },
+        "Varanasi": {
+            "airports": ["Lal Bahadur Shastri International Airport (VNS)"],
+            "attractions": ["Dashashwamedh Ghat", "Kashi Vishwanath Temple", "Sarnath", "Assi Ghat"],
+            "hotels": {
+                "luxury": ["Taj Ganges", "BrijRama Palace", "Ramada Plaza"],
+                "mid_range": ["Hotel Meraden Grand", "Hotel Hindusthan International"],
+                "budget": ["Zostel", "Stops Hostel", "Palace on Ganges"]
+            }
+        }
+    }
+}

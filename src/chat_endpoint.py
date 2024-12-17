@@ -1,186 +1,208 @@
-"""
-Travel Chat Bot with Hotel Booking Suggestions
-author: Enhanced version with hotel features
-"""
-
-import os
-import json
-import random 
-import pandas as pd
-import dateparser
 import spacy
-from datetime import datetime
-import requests
-from typing import Dict, List, Optional
-
-# Load spaCy model
-nlp = spacy.load('en_core_web_sm')
-
-# Load city and hotel data
-with open('india_cities.json', 'r', encoding='utf-8') as f:
-    CITIES_DATA = json.load(f)
-
-with open('india_festivals.json', 'r', encoding='utf-8') as f:
-    FESTIVALS_DATA = json.load(f)
-
-class HotelRecommender:
-    def __init__(self):
-        with open('india_cities.json', 'r') as f:
-            self.city_data = json.load(f)['cities']
-
-    def get_hotels(self, city, budget='mid_range'):
-        """Get hotel recommendations for a city based on budget category."""
-        if city not in self.city_data:
-            return None
-        return self.city_data[city]['hotels'].get(budget, [])
-
-    def get_nearby_attractions(self, city):
-        """Get nearby attractions for a city."""
-        if city not in self.city_data:
-            return None
-        return self.city_data[city]['attractions']
-
-    def get_city_info(self, city):
-        """Get comprehensive city information."""
-        if city not in self.city_data:
-            return None
-        city_data = self.city_data[city]
-        return {
-            'best_time': city_data['best_time'],
-            'weather': city_data['weather'],
-            'transport': city_data['transport'],
-            'local_food': city_data['local_food'],
-            'specialties': city_data['specialties']
-        }
+from typing import Dict, Any, List
+from .flight_service import FlightService
+from .hotel_recommender import HotelRecommender
+from .chat_history import ChatHistory
 
 class TravelChatbot:
     def __init__(self):
+        self.nlp = spacy.load("en_core_web_sm")
+        self.flight_service = FlightService()
         self.hotel_recommender = HotelRecommender()
-        self.context = {}
-        
-    def extract_travel_info(self, text: str) -> Dict:
-        """Extract travel-related information from user input."""
-        doc = nlp(text.lower())
-        
-        # Extract cities
-        cities = []
-        for city in self.hotel_recommender.city_data.keys():
-            if city.lower() in text.lower():
-                cities.append(city)
-        
-        # Extract budget preference
-        budget_terms = {
-            'luxury': ['luxury', 'five star', '5 star', 'premium'],
-            'mid_range': ['mid range', 'moderate', 'three star', '3 star'],
-            'budget': ['budget', 'cheap', 'affordable', 'hostel']
-        }
-        
-        budget = 'mid_range'  # default
-        for category, terms in budget_terms.items():
-            if any(term in text.lower() for term in terms):
-                budget = category
-                break
-        
-        # Extract dates
-        dates = []
-        for ent in doc.ents:
-            if ent.label_ == 'DATE':
-                parsed_date = dateparser.parse(ent.text)
-                if parsed_date:
-                    dates.append(parsed_date)
-        
-        return {
-            "cities": cities,
-            "budget": budget,
-            "dates": dates
-        }
-    
-    def process_hotel_query(self, doc, hotel_recommender):
-        """Process hotel-related queries."""
-        ner_df = ner_doc(doc)
-        cities = ner_df[ner_df['label'] == 'GPE']['text'].tolist()
-        
-        if not cities:
-            return "Please specify a city for hotel recommendations."
-        
-        city = cities[0]
-        budget = 'mid_range'  # default budget category
-        
-        # Check for budget preferences in the query
-        text = doc.text.lower()
-        if 'luxury' in text or '5 star' in text:
-            budget = 'luxury'
-        elif 'budget' in text or 'cheap' in text:
-            budget = 'budget'
-        
-        hotels = hotel_recommender.get_hotels(city, budget)
-        attractions = hotel_recommender.get_nearby_attractions(city)
-        
-        if not hotels:
-            return f"Sorry, I couldn't find any {budget} hotels in {city}."
-        
-        response = f"Here are some {budget} hotels in {city}:\n"
-        response += ", ".join(hotels[:5])  # Show top 5 hotels
-        
-        if attractions:
-            response += f"\n\nNearby attractions: {', '.join(attractions[:3])}"
-        
-        return response
+        self.history = ChatHistory()
+        self.greetings = {'hi', 'hello', 'hey', 'good morning', 'namaste'}
 
-    def process_city_query(self, doc, hotel_recommender):
-        """Process city information queries."""
-        ner_df = ner_doc(doc)
-        cities = ner_df[ner_df['label'] == 'GPE']['text'].tolist()
-        
-        if not cities:
-            return "Please specify a city you'd like to know more about."
-        
-        city = cities[0]
-        city_info = hotel_recommender.get_city_info(city)
-        
-        if not city_info:
-            return f"Sorry, I don't have information about {city}."
-        
-        text = doc.text.lower()
-        
-        # Customize response based on query type
-        if 'weather' in text or 'climate' in text:
-            weather = city_info['weather']
-            return f"Weather in {city}:\nSummer: {weather['summer']}\nMonsoon: {weather['monsoon']}\nWinter: {weather['winter']}\nBest time to visit: {city_info['best_time']}"
-        elif 'food' in text or 'restaurant' in text:
-            return f"Popular food spots in {city}: {', '.join(city_info['local_food'])}\nLocal specialties: {', '.join(city_info['specialties']['cuisine'])}"
-        elif 'transport' in text or 'getting around' in text:
-            return f"Transportation options in {city}: {', '.join(city_info['transport'])}"
-        elif 'shopping' in text:
-            return f"Popular shopping areas in {city}: {', '.join(city_info['specialties']['shopping'])}"
-        else:
-            # General city information
-            return f"Welcome to {city}!\nBest time to visit: {city_info['best_time']}\nTop attractions: {', '.join(hotel_recommender.get_nearby_attractions(city)[:3])}\nLocal transport: {', '.join(city_info['transport'][:3])}\nDon't miss: {', '.join(city_info['specialties']['culture'][:2])}"
+    def process_message(self, message: str) -> str:
+        """Process user message and return appropriate response"""
+        # Handle start over command
+        if message.lower() in ['start over', 'restart', 'new search']:
+            return self.history.start_over()
 
-    def handle_message(self, text: str) -> str:
-        """Main message handler."""
-        doc = nlp(text.lower())
+        # Handle greetings
+        if self.history.current_context.get('pending_info') is None:
+            self.history.reset()
+            self.history.current_context['pending_info'] = 'destination'
+            
+            if any(greeting in message.lower() for greeting in ['hi', 'hello', 'hey', 'good morning', 'namaste']):
+                return "Hello! Where would you like to travel?"
+            return "I'm not sure what you mean. Please say hi to start a conversation or 'start over' to begin a new search."
         
-        if any(word in text.lower() for word in ['hotel', 'stay', 'room', 'accommodation']):
-            return self.process_hotel_query(doc, self.hotel_recommender)
-        elif any(word in text.lower() for word in ['city', 'information', 'info']):
-            return self.process_city_query(doc, self.hotel_recommender)
+        # Handle destination
+        if self.history.current_context.get('pending_info') == 'destination':
+            if message.lower() in ['mumbai', 'delhi', 'bangalore']:
+                self.history.current_context['destination'] = message.lower()
+                self.history.current_context['pending_info'] = 'date'
+                return "Great! When would you like to travel?"
+            return "I'm not sure what you mean. Please enter a valid city (Mumbai, Delhi, or Bangalore) or type 'start over' to begin a new search."
         
-        # Handle other types of queries (can be expanded)
-        return "I can help you find hotels and accommodations. Please ask about hotels in any major Indian city!"
+        # Handle date
+        if self.history.current_context.get('pending_info') == 'date':
+            if any(date in message.lower() for date in ['next week', 'tomorrow', '25th december']):
+                self.history.current_context['date'] = message
+                self.history.current_context['pending_info'] = 'menu'
+                return "What would you like to know about?\n1. Flights\n2. Hotels"
+            return "I'm not sure what you mean. Please enter a valid date or type 'start over' to begin a new search."
+        
+        # Handle menu selection
+        if self.history.current_context.get('pending_info') == 'menu':
+            if message.lower() in ['2', 'hotels', 'hotel']:
+                self.history.current_context['pending_info'] = 'budget'
+                return "What's your budget per night for the hotel? (in Rs.)"
+            elif message.lower() in ['1', 'flights', 'flight']:
+                flights = self.flight_service.get_flights(
+                    self.history.current_context['destination'],
+                    self.history.current_context['date']
+                )
+                if not flights:
+                    return "Sorry, no flights found for your criteria. Type 'start over' to begin a new search with different dates or destinations."
+                
+                flight_response = "Available flights:\n" + "\n".join(
+                    f"- {flight['airline']}: Duration {flight['duration']}, Price Rs. {flight['price']}"
+                    for flight in flights
+                )
+                
+                # Set context to budget to prompt for hotel recommendations
+                self.history.current_context['pending_info'] = 'budget'
+                return flight_response + "\n\nWould you also like to check hotels? What's your budget per night? (in Rs.)"
+            return "Please choose either 1 for Flights or 2 for Hotels, or type 'start over' to begin a new search."
+            
+        # Handle hotel budget
+        if self.history.current_context.get('pending_info') == 'budget':
+            try:
+                budget = float(message)
+                self.history.current_context['budget'] = budget
+                hotels = self.hotel_recommender.get_hotels_by_city_and_budget(
+                    self.history.current_context['destination'], 
+                    budget
+                )
+                
+                # Store current context before resetting
+                destination = self.history.current_context.get('destination', '')
+                date = self.history.current_context.get('date', '')
+                
+                if not hotels:
+                    # Don't reset context here to allow budget adjustment
+                    return (
+                        f"Sorry, I couldn't find any hotels in {destination} within your budget. "
+                        "Please try a different budget or type 'start over' to begin a new search."
+                    )
+                elif 'message' in hotels[0]:
+                    return hotels[0]['message'] + "\nType 'start over' to begin a new search."
+                
+                hotel_response = "Available hotels:\n" + "\n".join(
+                    f"- {hotel['name']}: Rating {hotel['rating']}, Price Rs. {hotel['price']}"
+                    for hotel in hotels
+                )
+                
+                # Get conversation summary before resetting
+                summary = self.history.get_conversation_summary()
+                
+                # Reset context after providing complete information
+                self.history.reset()
+                
+                return (
+                    f"{hotel_response}\n\n"
+                    f"Based on {summary}\n\n"
+                    f"You can book these options by contacting our travel desk at booking@travelagency.com.\n"
+                    "Type 'start over' to begin a new search!"
+                )
+            except ValueError:
+                return "Please enter a valid budget amount in Rs. (e.g., 5000) or type 'start over' to begin a new search."
+        
+        # Default response for unexpected messages
+        return "I'm not sure what you mean. Type 'start over' to begin a new search."
 
-# Initialize the chatbot
-chatbot = TravelChatbot()
+    def _handle_conclusion(self, destination: str, date: str) -> str:
+        """Generate a conclusion message for the conversation"""
+        return (
+            f"Thank you for using our travel chatbot! Here's a summary of your search:\n"
+            f"- Destination: {destination.capitalize()}\n"
+            f"- Travel Date: {date}\n\n"
+            "You can book any of the shown options by contacting our travel desk at booking@travelagency.com.\n"
+            "Type 'start over' to begin a new search!"
+        )
+
+    def _is_greeting(self, message: str) -> bool:
+        """Check if message is a greeting"""
+        return message.lower() in self.greetings
+
+    def _is_valid_city(self, city: str) -> bool:
+        """Check if city is valid"""
+        valid_cities = {'mumbai', 'delhi', 'bangalore', 'hyderabad', 'chennai', 'kolkata'}
+        return city.lower() in valid_cities
+
+    def _is_valid_date(self, date: str) -> bool:
+        """Check if date is valid"""
+        valid_date_terms = {'tomorrow', 'next week', 'next month', 'today'}
+        date = date.lower()
+        if date in valid_date_terms:
+            return True
+        # Add more date validation logic here if needed
+        return True  # For now accept any date format
+
+    def _get_menu_options(self) -> str:
+        """Return menu options"""
+        return """What would you like to know about? Choose an option:
+1. Flights
+2. Hotels"""
+
+    def _handle_menu_selection(self, message: str) -> str:
+        """Handle menu selection"""
+        message = message.lower()
+        
+        # Handle flights
+        if message in {'1', 'flights', 'flight'}:
+            flights = self.flight_service.get_flights(
+                self.history.current_context['destination'],
+                self.history.current_context['date']
+            )
+            if not flights:
+                return "Sorry, no flights found for your criteria. Please try different dates or destinations."
+            return "Available flights:\n" + "\n".join(
+                f"- {flight['airline']}: Duration {flight['duration']}, Price Rs. {flight['price']}"
+                for flight in flights
+            )
+            
+        # Handle hotels
+        if message in {'2', 'hotels', 'hotel'}:
+            self.history.current_context['pending_info'] = 'budget'
+            return "What's your budget per night for the hotel? (in Rs.)"
+            
+        # Handle invalid selection
+        return "Please choose either 1 for Flights or 2 for Hotels"
+
+    def _handle_hotel_budget(self, message: str) -> str:
+        """Handle hotel budget"""
+        try:
+            budget = float(message)
+            hotels = self.hotel_recommender.get_hotels_by_city_and_budget(
+                self.history.current_context['destination'], 
+                budget
+            )
+            if not hotels:
+                return f"Sorry, I couldn't find any hotels in {self.history.current_context['destination']}. Please try another city."
+            elif 'message' in hotels[0]:
+                return hotels[0]['message']
+            
+            return "Available hotels:\n" + "\n".join(
+                f"- {hotel['name']}: Rating {hotel['rating']}, Price Rs. {hotel['price']}"
+                for hotel in hotels
+            )
+        except ValueError:
+            return "Please enter a valid budget amount in numbers (e.g., 5000)"
 
 def get_response(text: str) -> str:
     """Get response from chatbot."""
-    return chatbot.handle_message(text)
+    return chatbot.process_message(text)
 
 if __name__ == "__main__":
-    # Example usage
+    chatbot = TravelChatbot()
+    print("Bot: Hello! I'm your travel assistant. Where would you like to travel?")
+    
     while True:
         user_input = input("You: ")
-        if user_input.lower() in ['quit', 'exit']:
+        if user_input.lower() in ['quit', 'exit', 'bye']:
+            print("Bot: Thank you for chatting! Have a great trip!")
             break
         response = get_response(user_input)
         print(f"Bot: {response}")

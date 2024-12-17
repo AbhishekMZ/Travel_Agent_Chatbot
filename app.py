@@ -1,34 +1,44 @@
+import os
+import sys
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import json
 import dateparser
 import spacy
 from datetime import datetime
-import os
+from src.chat_endpoint import TravelChatbot
 
-app = Flask(__name__)
+# Initialize Flask app with static folder configuration
+app = Flask(__name__, 
+    static_url_path='/static',
+    static_folder='static',
+    template_folder='templates'
+)
 
-# Load spaCy model
-nlp = spacy.load('en_core_web_sm')
+# Load data files
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
-# Load travel intents
-with open('travel_intents.json', 'r') as f:
-    travel_intents = json.load(f)
+def load_json_file(filename, default=None):
+    try:
+        with open(os.path.join(DATA_DIR, filename), 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"Warning: {filename} not found in data directory")
+        return default or {}
 
-# Load airports data
-airports_df = pd.read_csv('airports.csv')
+def load_csv_file(filename):
+    try:
+        return pd.read_csv(os.path.join(DATA_DIR, filename))
+    except FileNotFoundError:
+        print(f"Warning: {filename} not found in data directory")
+        return pd.DataFrame()
 
-def process_message(user_message):
-    doc = nlp(user_message.lower())
-    
-    # Basic intent matching
-    for intent in travel_intents['intents']:
-        for pattern in intent['patterns']:
-            if pattern.lower() in user_message.lower():
-                return random.choice(intent['responses'])
-    
-    # Default response
-    return "I'm sorry, I didn't quite understand that. Could you please rephrase your question about travel?"
+# Load data files
+travel_intents = load_json_file('india_travel_intents.json', {"intents": []})
+airports_df = load_csv_file('airports.csv')
+
+# Initialize the chatbot with data
+chatbot = TravelChatbot()
 
 @app.route('/')
 def home():
@@ -36,9 +46,13 @@ def home():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_message = request.json['message']
-    response = process_message(user_message)
-    return jsonify({'response': response})
+    try:
+        user_message = request.json['message']
+        response = chatbot.process_message(user_message)
+        return jsonify({'response': response})
+    except Exception as e:
+        print(f"Error processing message: {str(e)}")
+        return jsonify({'response': f"I apologize, but I encountered an error. Please try again or rephrase your question."})
 
 if __name__ == '__main__':
     app.run(debug=True)
