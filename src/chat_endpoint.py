@@ -64,7 +64,7 @@ class TravelChatbot:
                 # Set context to budget to prompt for hotel recommendations
                 self.history.current_context['pending_info'] = 'budget'
                 return flight_response + "\n\nWould you also like to check hotels? What's your budget per night? (in Rs.)"
-            return "Please choose either 1 for Flights or 2 for Hotels, or type 'start over' to begin a new search."
+            return "Please choose either 1 for Flights or 2 for Hotels."
             
         # Handle hotel budget
         if self.history.current_context.get('pending_info') == 'budget':
