@@ -1,262 +1,186 @@
-"""Travel Chat Bot on Slack
-
-title:  chat_endpoint.py
-author: Anthony Leung
-usage:  python3 chat_endpoint.py
+"""
+Travel Chat Bot with Hotel Booking Suggestions
+author: Enhanced version with hotel features
 """
 
 import os
+import json
 import random 
 import pandas as pd
-import json
 import dateparser
 import spacy
-import response
-from spacy.pipeline import EntityRuler
-from spacy.matcher import Matcher
+from datetime import datetime
+import requests
+from typing import Dict, List, Optional
 
-from fastai import *
-from fastai.text import *
-from fastai.callbacks import *
-
-from slackeventsapi import SlackEventAdapter
-from slack import WebClient
-
-# Change directory to parent folder
-os.chdir('../')
-
-# Our app's Slack Event Adapter for receiving actions via the Events API
-slack_signing_secret = os.environ['SLACK_SIGNING_SECRET']
-slack_events_adapter = SlackEventAdapter(slack_signing_secret, '/slack/events')
-
-# Create a SlackClient for your bot to use for Web API requests
-slack_bot_token = os.environ['SLACK_BOT_TOKEN']
-slack_client = WebClient(slack_bot_token)
-
-slack_bot_id = os.environ['SLACK_BOT_USER_ID']
-
-####==== SKYSCANNER ====####
-sky_url = os.environ['SKYSCAN_URL']
-rapid_host = os.environ['RAPID_HOST']
-rapid_key = os.environ['RAPID_KEY']
-
-####===== spaCy ====####
-# Load spaCy object
+# Load spaCy model
 nlp = spacy.load('en_core_web_sm')
 
-# Create Matcher object for phrase matching
-matcher = Matcher(nlp.vocab)
+# Load city and hotel data
+with open('india_cities.json', 'r', encoding='utf-8') as f:
+    CITIES_DATA = json.load(f)
 
-# Starting location
-pattern_start = [{'LOWER': 'from', },
-            {"ENT_TYPE": "GPE", "OP": "+"},
-            ]
+with open('india_festivals.json', 'r', encoding='utf-8') as f:
+    FESTIVALS_DATA = json.load(f)
 
-# Ending/Destination location
-pattern_end = [{'LOWER': 'to'},
-            {"ENT_TYPE": "GPE", "OP": "+"}]
+class HotelRecommender:
+    def __init__(self):
+        with open('india_cities.json', 'r') as f:
+            self.city_data = json.load(f)['cities']
 
-# Add patterns to matcher object
-matcher.add("START_LOC", None, pattern_start)
-matcher.add("END_LOC", None, pattern_end)
+    def get_hotels(self, city, budget='mid_range'):
+        """Get hotel recommendations for a city based on budget category."""
+        if city not in self.city_data:
+            return None
+        return self.city_data[city]['hotels'].get(budget, [])
 
+    def get_nearby_attractions(self, city):
+        """Get nearby attractions for a city."""
+        if city not in self.city_data:
+            return None
+        return self.city_data[city]['attractions']
 
+    def get_city_info(self, city):
+        """Get comprehensive city information."""
+        if city not in self.city_data:
+            return None
+        city_data = self.city_data[city]
+        return {
+            'best_time': city_data['best_time'],
+            'weather': city_data['weather'],
+            'transport': city_data['transport'],
+            'local_food': city_data['local_food'],
+            'specialties': city_data['specialties']
+        }
 
-####===== Process chatbot responses =====#####
-chat_df = pd.read_csv('travel_chat.csv')
-chat_df['response'] =  chat_df['response'].apply(lambda x: x.strip('[]')
-                                          .replace("'","").split(', '))
-response_dict = dict(zip(chat_df['label'], chat_df['response'].tolist()))
-
-####===== Load and process Airport codes ====#####
-fields = ['Name', 'City', 'IATA']
-airport_df = pd.read_csv('airports.csv', usecols=fields)
-
-air_int_df = airport_df[airport_df['Name'].apply(lambda x: 'International' in x)]
-
-####===== Load speech intent classifier =====#####
-data_bunch = 'data_clas_export_travel_chats.pkl'
-trained_model ='travel-chat-clas-model'
-encoder = 'ft_enc'
-
-path = Path('')
-data_clas = load_data(path, data_bunch, bs=8)
-clas_learn = text_classifier_learner(data_clas, AWD_LSTM, drop_mult=0.5)
-clas_learn.load(trained_model)
-clas_learn.load_encoder(encoder)
-
-
-####==== HELPER METHODS ====####
-def ner_doc(doc):
-    '''
-    takes an spacy doc object and makes a ner 
-    and returns a dataframe of entities.
-    '''
-    col_names = ['text',  'label']
-    sent_df = pd.DataFrame(columns=col_names)
-    for ent in doc.ents:
-        temp = pd.DataFrame([[ent.text, ent.label_]], columns=col_names)
-        sent_df = pd.concat([sent_df, temp], ignore_index=True)
-    return sent_df 
-
-
-def loc_matcher(doc):
-    '''
-    Takes a spacy doc object and find  
-    matching patterns on origin and destination
-    locations. Returns results as a dataframe.
-    '''
-    #match_id, start and stop indexes of the matched words
-    matches = matcher(doc)
-    col_names = ['pattern', 'text', 'location']
-    match_result = pd.DataFrame(columns=col_names)
-
-    #Find all matched results and extract out the results
-    for match_id, start, end in matches:
-        # Get the string representation 
-        string_id = nlp.vocab.strings[match_id]  
-        span = doc[start:end]  # The matched span
-        loc = doc[start+1:end].text
-        temp = pd.DataFrame([[string_id, span.text, loc]], columns=col_names)
-        match_result = pd.concat([match_result, temp], ignore_index=True)
+class TravelChatbot:
+    def __init__(self):
+        self.hotel_recommender = HotelRecommender()
+        self.context = {}
         
-    return match_result
-
-def travel_api_get(ner_df, match_df):
-    '''
-    Makes a GET request on a travel API to get flight information.
-    '''
-    # Extract all relevant entities
-    origin_list = match_df[match_df['pattern']=='START_LOC'].loc[:,'location'].tolist()
-    dest_list = match_df[match_df['pattern']=='END_LOC'].loc[:,'location'].tolist()
+    def extract_travel_info(self, text: str) -> Dict:
+        """Extract travel-related information from user input."""
+        doc = nlp(text.lower())
+        
+        # Extract cities
+        cities = []
+        for city in self.hotel_recommender.city_data.keys():
+            if city.lower() in text.lower():
+                cities.append(city)
+        
+        # Extract budget preference
+        budget_terms = {
+            'luxury': ['luxury', 'five star', '5 star', 'premium'],
+            'mid_range': ['mid range', 'moderate', 'three star', '3 star'],
+            'budget': ['budget', 'cheap', 'affordable', 'hostel']
+        }
+        
+        budget = 'mid_range'  # default
+        for category, terms in budget_terms.items():
+            if any(term in text.lower() for term in terms):
+                budget = category
+                break
+        
+        # Extract dates
+        dates = []
+        for ent in doc.ents:
+            if ent.label_ == 'DATE':
+                parsed_date = dateparser.parse(ent.text)
+                if parsed_date:
+                    dates.append(parsed_date)
+        
+        return {
+            "cities": cities,
+            "budget": budget,
+            "dates": dates
+        }
     
-    origin_loc = origin_list[-1]
-    dest_loc = dest_list[-1]
-    
-    # Map location to airport code
-    origin_code = air_int_df[air_int_df['City'] == origin_loc]['IATA'].iloc[0]
-    dest_code = air_int_df[air_int_df['City'] == dest_loc]['IATA'].iloc[0]
+    def process_hotel_query(self, doc, hotel_recommender):
+        """Process hotel-related queries."""
+        ner_df = ner_doc(doc)
+        cities = ner_df[ner_df['label'] == 'GPE']['text'].tolist()
+        
+        if not cities:
+            return "Please specify a city for hotel recommendations."
+        
+        city = cities[0]
+        budget = 'mid_range'  # default budget category
+        
+        # Check for budget preferences in the query
+        text = doc.text.lower()
+        if 'luxury' in text or '5 star' in text:
+            budget = 'luxury'
+        elif 'budget' in text or 'cheap' in text:
+            budget = 'budget'
+        
+        hotels = hotel_recommender.get_hotels(city, budget)
+        attractions = hotel_recommender.get_nearby_attractions(city)
+        
+        if not hotels:
+            return f"Sorry, I couldn't find any {budget} hotels in {city}."
+        
+        response = f"Here are some {budget} hotels in {city}:\n"
+        response += ", ".join(hotels[:5])  # Show top 5 hotels
+        
+        if attractions:
+            response += f"\n\nNearby attractions: {', '.join(attractions[:3])}"
+        
+        return response
 
-    # Parse any date entities to the format 'YYYY-MM-DD'
-    depart_date = None
-    return_date = None
-    date_df = ner_df[ner_df['label'] == 'DATE']
-    n_date = len(date_df)
-    if (n_date == 2):
-      date_df = date_df.sort_values(by=['text'])
-      depart_date = date_df['text'].iloc[0]
-      return_date = date_df['text'].iloc[1]
-     
-      depart_date = dateparser.parse(depart_date).strftime('%Y-%m-%d')
-      return_date = dateparser.parse(return_date).strftime('%Y-%m-%d')
-    else:
-      depart_date = date_df['text'].iloc[0]
-      depart_date = dateparser.parse(depart_date).strftime('%Y-%m-%d')
-    
-    # Define url properties
-    URL = sky_url 
-    country = 'CA'
-    currency = 'CAD'
-    locale = 'en-US'
-    originPlace = origin_code
-    destinationPlace = dest_code
-    outboundPartialDate = depart_date
+    def process_city_query(self, doc, hotel_recommender):
+        """Process city information queries."""
+        ner_df = ner_doc(doc)
+        cities = ner_df[ner_df['label'] == 'GPE']['text'].tolist()
+        
+        if not cities:
+            return "Please specify a city you'd like to know more about."
+        
+        city = cities[0]
+        city_info = hotel_recommender.get_city_info(city)
+        
+        if not city_info:
+            return f"Sorry, I don't have information about {city}."
+        
+        text = doc.text.lower()
+        
+        # Customize response based on query type
+        if 'weather' in text or 'climate' in text:
+            weather = city_info['weather']
+            return f"Weather in {city}:\nSummer: {weather['summer']}\nMonsoon: {weather['monsoon']}\nWinter: {weather['winter']}\nBest time to visit: {city_info['best_time']}"
+        elif 'food' in text or 'restaurant' in text:
+            return f"Popular food spots in {city}: {', '.join(city_info['local_food'])}\nLocal specialties: {', '.join(city_info['specialties']['cuisine'])}"
+        elif 'transport' in text or 'getting around' in text:
+            return f"Transportation options in {city}: {', '.join(city_info['transport'])}"
+        elif 'shopping' in text:
+            return f"Popular shopping areas in {city}: {', '.join(city_info['specialties']['shopping'])}"
+        else:
+            # General city information
+            return f"Welcome to {city}!\nBest time to visit: {city_info['best_time']}\nTop attractions: {', '.join(hotel_recommender.get_nearby_attractions(city)[:3])}\nLocal transport: {', '.join(city_info['transport'][:3])}\nDon't miss: {', '.join(city_info['specialties']['culture'][:2])}"
 
-    URL_complete = f'{URL}/{country}/{currency}/{locale}/{originPlace}/{destinationPlace}/{outboundPartialDate}'
-    
-    headers = {
-    'x-rapidapi-host': rapid_host,
-    'x-rapidapi-key': rapid_key 
-    }
-    # JSON object output from the GET requet has 'true' and 'false' 
-    # entries in improper format. Need to set them accordingly.
-    true = True
-    false = False
+    def handle_message(self, text: str) -> str:
+        """Main message handler."""
+        doc = nlp(text.lower())
+        
+        if any(word in text.lower() for word in ['hotel', 'stay', 'room', 'accommodation']):
+            return self.process_hotel_query(doc, self.hotel_recommender)
+        elif any(word in text.lower() for word in ['city', 'information', 'info']):
+            return self.process_city_query(doc, self.hotel_recommender)
+        
+        # Handle other types of queries (can be expanded)
+        return "I can help you find hotels and accommodations. Please ask about hotels in any major Indian city!"
 
-    # If there is a return date, then add inbound date into URL
-    if return_date != None:
-      inboundPartialDate = return_date
-      URL_complete = URL_complete + f'/{inboundPartialDate}'
-    
-    # Pull flight info via GET request
-    flight_resp = requests.request('GET', URL_complete, headers=headers)
+# Initialize the chatbot
+chatbot = TravelChatbot()
 
-    return flight_resp
+def get_response(text: str) -> str:
+    """Get response from chatbot."""
+    return chatbot.handle_message(text)
 
-
-def flight_response(doc):
-    '''
-    Constructs a response for a flight request from the user.
-    '''
-    # Identify relevant entities
-    ner_df = ner_doc(doc)
-
-    # Get the number of dates and locations
-    n_loc = len(ner_df[ner_df['label'] == 'GPE'])
-    n_date = len(ner_df[ner_df['label'] == 'DATE'])
-
-    # Return if there are not enough flight information.
-    if (n_loc < 2) or (n_date ==0):
-        resp = "Sorry I don't understand. Please restate your flight request \
-with complete dates and locations."
-        return resp
-
-    # Continue routine via GET request
-    match_df = loc_matcher(doc)
-    flight_resp = travel_api_get(ner_df, match_df)
-    resp_json = json.loads(flight_resp.text)
-
-    # Extract all price quotes
-    quotes = resp_json['Quotes']
-    n_quotes = len(quotes)
-    if (n_quotes == 0):
-        resp = 'No flights are available with the details you provided.'
-        return resp
-    
-    # Concat prices into a single string.
-    price_str = ""
-    for quote in quotes:
-        price = quote['MinPrice']
-        depart_time = quote['OutboundLeg']['DepartureDate']
-        price_str += f'${price} ({depart_time}); '
-
-    #Extract all relevant flight entities
-    depart_date = ner_df.loc[ner_df['label'] == 'DATE', 'text'].iloc[0]
-    
-    start_list = match_df[match_df['pattern']=='START_LOC'].loc[:,'location'].tolist()
-    dest_list = match_df[match_df['pattern']=='END_LOC'].loc[:,'location'].tolist()
-    
-    origin_loc = start_list[-1]
-    dest_loc = dest_list[-1]
-    
-    resp = f'Flight tickets from {origin_loc} to {dest_loc} leaving on {depart_date}: '+price_str
-    
-    return resp 
-       
-
-@slack_events_adapter.on('message')
-def handle_message(event_data):
-    '''
-    Main method to handle Slack messages.
-    '''
-    message = event_data['event']
-     
-    #If the incoming message is not from the bot, then respond. 
-    if message['user'] != slack_bot_id:
-       msg = message.get('text')
-       pred = clas_learn.predict(msg)
-       msg_intent = str(pred[0])
-       channel = message['channel']
-       doc = nlp(msg)
-       resp = random.choice(response_dict[msg_intent])
-     
-       if (msg_intent=='SearchFlight'):
-            resp = flight_response(doc)
-
-       slack_client.chat_postMessage(channel=channel,
-                                  text=resp)
-                               
-
-if __name__=="__main__":
-
-      slack_events_adapter.start(port=3000)
+if __name__ == "__main__":
+    # Example usage
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ['quit', 'exit']:
+            break
+        response = get_response(user_input)
+        print(f"Bot: {response}")

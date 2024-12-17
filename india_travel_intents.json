@@ -1,0 +1,139 @@
+{
+    "intents": [
+        {
+            "tag": "greeting",
+            "patterns": [
+                "Namaste", "Hello", "Hi there", "Good morning", "Namaskar",
+                "Sat sri akal", "Kem cho", "Vanakkam", "Hey there",
+                "Greetings", "Hi, need help with travel", "Hello, travel advice needed"
+            ],
+            "responses": [
+                "Namaste! How may I help you plan your Indian journey?",
+                "Hello! Ready to help you explore incredible India.",
+                "Welcome! Let me help you plan your perfect Indian vacation."
+            ]
+        },
+        {
+            "tag": "flight_search_domestic",
+            "patterns": [
+                "Flight from Delhi to Mumbai",
+                "Show me flights between Bangalore and Chennai",
+                "I need to book a flight from Kolkata to Hyderabad",
+                "Flights from Pune to Delhi",
+                "Show air tickets from Ahmedabad to Goa",
+                "Need flights Jaipur to Mumbai",
+                "Flight options from Chennai to Varanasi",
+                "Book tickets from Lucknow to Bangalore",
+                "Flights between Kochi and Delhi",
+                "Air travel from Indore to Chandigarh"
+            ],
+            "responses": [
+                "I'll help you find flights between {origin} and {destination}. Could you please specify your travel dates?",
+                "Let me search for flights from {origin} to {destination}. What are your preferred travel dates?",
+                "I can help you with flights between {origin} and {destination}. When would you like to travel?"
+            ]
+        },
+        {
+            "tag": "hotel_search",
+            "patterns": [
+                "Hotels in Agra near Taj Mahal",
+                "Luxury hotels in Mumbai",
+                "Budget hotels in Delhi",
+                "Places to stay in Goa near beach",
+                "Hotels in Jaipur near Hawa Mahal",
+                "Accommodation in Varanasi near ghats",
+                "5 star hotels in Bangalore",
+                "Hotels in Udaipur with lake view",
+                "Resorts in Kerala backwaters",
+                "Hotels in Shimla with mountain view",
+                "Budget stays in Rishikesh",
+                "Heritage hotels in Rajasthan"
+            ],
+            "responses": [
+                "I'll find you the best hotels in {location} based on your preferences. What's your budget range?",
+                "Let me search for accommodations in {location}. Would you prefer luxury, mid-range, or budget options?",
+                "I can help you find great stays in {location}. What kind of amenities are you looking for?"
+            ]
+        },
+        {
+            "tag": "tourist_places",
+            "patterns": [
+                "Places to visit in Delhi",
+                "Tourist attractions in Mumbai",
+                "What to see in Agra",
+                "Best places in Rajasthan",
+                "Tourist spots in Kerala",
+                "Places to visit in Goa",
+                "Sightseeing in Varanasi",
+                "Tourist places in Jaipur",
+                "What to explore in Hampi",
+                "Must-visit places in Amritsar"
+            ],
+            "responses": [
+                "Here are some popular attractions in {location}: {attractions}",
+                "The must-visit places in {location} include: {attractions}",
+                "Popular tourist spots in {location} are: {attractions}"
+            ]
+        },
+        {
+            "tag": "weather_query",
+            "patterns": [
+                "Weather in Mumbai during monsoon",
+                "Best time to visit Kerala",
+                "Delhi weather in summer",
+                "When to visit Goa",
+                "Rajasthan weather in winter",
+                "Climate in Darjeeling",
+                "Monsoon in Kerala",
+                "Temperature in Ladakh",
+                "Weather conditions in Shimla",
+                "Best season for Andaman"
+            ],
+            "responses": [
+                "Let me check the weather conditions in {location} for your planned dates.",
+                "I'll help you understand the best time to visit {location} based on weather patterns.",
+                "Here's the weather information for {location} during {season}"
+            ]
+        },
+        {
+            "tag": "food_query",
+            "patterns": [
+                "Best restaurants in Delhi",
+                "Famous food in Mumbai",
+                "Where to eat in Hyderabad",
+                "Traditional food in Kerala",
+                "Restaurants in Jaipur",
+                "Street food in Kolkata",
+                "Best biryani in Hyderabad",
+                "Vegetarian restaurants in Gujarat",
+                "Famous sweets in Bengal",
+                "Punjab ka khana"
+            ],
+            "responses": [
+                "Here are some popular food options in {location}: {food_options}",
+                "You must try these dishes in {location}: {specialties}",
+                "Famous restaurants in {location} include: {restaurants}"
+            ]
+        },
+        {
+            "tag": "transport_query",
+            "patterns": [
+                "How to reach Taj Mahal from Delhi",
+                "Transport options in Mumbai",
+                "Local travel in Chennai",
+                "Best way to reach Varanasi",
+                "Getting around in Kolkata",
+                "Transport to Rishikesh",
+                "Local buses in Bangalore",
+                "Metro in Delhi",
+                "Auto rickshaw rates",
+                "Cab services in Hyderabad"
+            ],
+            "responses": [
+                "Here are the transport options available in {location}: {options}",
+                "The best way to travel in {location} is: {transport_mode}",
+                "Let me help you with transportation details for {location}"
+            ]
+        }
+    ]
+}

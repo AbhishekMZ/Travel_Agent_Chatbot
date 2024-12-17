@@ -1,0 +1,61 @@
+{
+    "festivals": {
+        "Diwali": {
+            "month": "October-November",
+            "duration": "5 days",
+            "best_places": ["Jaipur", "Varanasi", "Delhi", "Mumbai"],
+            "special_events": ["Light displays", "Fireworks", "Temple ceremonies"],
+            "travel_tips": ["Book accommodations in advance", "Expect higher prices", "Popular time for shopping"]
+        },
+        "Holi": {
+            "month": "March",
+            "duration": "2 days",
+            "best_places": ["Mathura", "Vrindavan", "Jaipur", "Delhi"],
+            "special_events": ["Color throwing", "Music festivals", "Traditional sweets"],
+            "travel_tips": ["Wear old clothes", "Book early", "Choose accommodation near celebration spots"]
+        },
+        "Durga Puja": {
+            "month": "September-October",
+            "duration": "10 days",
+            "best_places": ["Kolkata", "Delhi", "Mumbai"],
+            "special_events": ["Pandal hopping", "Cultural performances", "Food festivals"],
+            "travel_tips": ["Book flights early", "Plan pandal visits", "Try local cuisine"]
+        },
+        "Kerala Boat Race": {
+            "month": "August-September",
+            "duration": "1-2 days per race",
+            "best_places": ["Alleppey", "Kottayam"],
+            "special_events": ["Snake boat races", "Cultural shows", "Local festivals"],
+            "travel_tips": ["Book waterfront hotels", "Arrive early for good spots", "Carry rain gear"]
+        },
+        "Pushkar Fair": {
+            "month": "November",
+            "duration": "5 days",
+            "best_places": ["Pushkar", "Ajmer"],
+            "special_events": ["Camel fair", "Cultural programs", "Traditional markets"],
+            "travel_tips": ["Book luxury tents", "Plan desert safaris", "Carry warm clothes"]
+        }
+    },
+    "peak_seasons": {
+        "Golden Triangle": {
+            "best_time": "October to March",
+            "avoid": "May to July",
+            "tips": ["Book AC transport in summer", "Early morning sightseeing", "Carry water"]
+        },
+        "Kerala": {
+            "best_time": "September to March",
+            "avoid": "June to August",
+            "tips": ["Book houseboats in advance", "Carry rain gear", "Try Ayurvedic treatments"]
+        },
+        "Goa": {
+            "best_time": "November to February",
+            "avoid": "June to September",
+            "tips": ["Book beach resorts early", "Try water sports", "Visit old churches"]
+        },
+        "Rajasthan": {
+            "best_time": "October to March",
+            "avoid": "April to June",
+            "tips": ["Stay in heritage hotels", "Desert camping", "Visit palaces early morning"]
+        }
+    }
+}

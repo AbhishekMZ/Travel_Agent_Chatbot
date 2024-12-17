@@ -1,20 +1,111 @@
-# Travel Chatbot on Slack
+# India Travel Chatbot
 
-The purpose of this project is to build a simple chatbot where a user can request flight prices through conversation.
+An intelligent chatbot specialized in Indian travel assistance, providing hotel recommendations, cultural insights, and travel planning help.
 
-The project was originally assigned at 1000ml - an institution for practical AI based in Toronto. Presentation of results can be found in this repo as well. Note that work is added onto this repo in a ongoing basis and so the slides represents progress during Feb 2020.
+## Features
 
-## Prerequsite
-Notebook and script are written in Python 3. The libraries used for this project are listed under the `requirements.txt` file. It is recommended to first set up a virtual environment and then install the libraries with:
+### Hotel Recommendations
+- Personalized hotel suggestions based on:
+  - City preferences
+  - Budget categories (luxury, mid-range, budget)
+  - Peak season awareness
+  - Nearby attractions
+  - Festival considerations
 
+### Travel Information
+- Comprehensive city guides
+- Festival and event information
+- Weather-aware recommendations
+- Local attraction details
+- Cultural insights
+
+### Smart Context Handling
+- Budget-aware suggestions
+- Seasonal considerations
+- Festival period adjustments
+- Location-specific tips
+
+## Setup
+
+1. Install dependencies:
 ```bash
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-## Description
-A speech intent classifier is trained by using NLP transfer learning - the Universal Language Model Fine-tuning (ULMFiT) method. I came across this approach when researching transfer learning in NLP applications since it already existed for image classification. In this work, ULMFiT was implemented by using fastai: https://docs.fast.ai/text.html. An impressive accuracy of 93% was achieved on the speech intent classifier considering my travel chat corpus has about 250 examples. The work is documented in the `chat_model.ipynb` notebook in this repo. It should be noted that the notebook was originally developed on Google Colab.
+2. Download spaCy model:
+```bash
+python -m spacy download en_core_web_sm
+```
 
-An endpoint of sorts is created which contains a travel API and the SlackEventsAPI. This is referring to the `chat_endpoint.py` script in this repo. The `requests` library on Python is used for http methods to make requests with the travel API. Furthermore, one would need to create an app on Slack in order to generate the required tokens that allows the script to interact with Slack. One can follow the Slack [tutorial](https://github.com/slackapi/python-slack-events-api/tree/master/example) to set this up. 
+3. Ensure all data files are present:
+- india_cities.json
+- india_festivals.json
+- india_travel_data.csv
+- india_travel_intents.json
 
-## Demo
-![](web/chat_demo.gif)
+## Usage
+
+Run the chatbot:
+```bash
+python src/chat_endpoint.py
+```
+
+### Example Queries
+
+1. Hotel Search:
+   - "Show me luxury hotels in Mumbai"
+   - "Find budget hotels in Delhi near Red Fort"
+   - "Hotels in Jaipur during Diwali"
+
+2. Travel Information:
+   - "What's the best time to visit Kerala?"
+   - "Tell me about festivals in Rajasthan"
+   - "Popular attractions in Agra"
+
+## Data Structure
+
+The chatbot uses several JSON files for structured data:
+
+1. `india_cities.json`: City-specific information including:
+   - Hotels by category
+   - Local attractions
+   - Transportation options
+   - Weather patterns
+
+2. `india_festivals.json`: Festival and seasonal information:
+   - Major festivals
+   - Peak seasons
+   - Travel tips
+   - Cultural events
+
+3. `india_travel_intents.json`: Conversation patterns:
+   - User intents
+   - Response templates
+   - Query patterns
+
+## Customization
+
+You can extend the chatbot's knowledge by:
+1. Adding new cities to `india_cities.json`
+2. Including more festivals in `india_festivals.json`
+3. Expanding travel patterns in `india_travel_intents.json`
+
+## Dependencies
+
+- Python 3.8+
+- spaCy
+- pandas
+- dateparser
+- requests
+
+## Contributing
+
+Feel free to contribute by:
+1. Adding more cities and hotels
+2. Improving response patterns
+3. Adding new features
+4. Enhancing cultural context
+
+## License
+
+MIT License

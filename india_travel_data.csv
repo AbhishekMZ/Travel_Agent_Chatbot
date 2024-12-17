@@ -1,0 +1,28 @@
+context,response,text,label
+[''],"['Namaste! How may I help you plan your Indian journey?']","Namaste",greeting
+[''],"['Hello! Ready to help you explore incredible India.']","Hi there",greeting
+[''],"['Welcome! Let me help you plan your perfect Indian vacation.']","Namaskar",greeting
+[''],"['I can help you find flights between Delhi and Mumbai. When would you like to travel?']","I need a flight from Delhi to Mumbai",flight_search_domestic
+[''],"['Let me search for flights from Bangalore to Chennai. What are your preferred travel dates?']","Show flights Bangalore to Chennai",flight_search_domestic
+[''],"['I'll help you find flights between Kolkata and Hyderabad. Could you please specify your travel dates?']","Flight Kolkata to Hyderabad",flight_search_domestic
+[''],"['Let me search for accommodations in Agra. Would you prefer luxury, mid-range, or budget options?']","Hotels near Taj Mahal",hotel_search
+[''],"['I'll find you the best hotels in Mumbai based on your preferences. What's your budget range?']","5 star hotels in Mumbai",hotel_search
+[''],"['I can help you find great stays in Goa. What kind of amenities are you looking for?']","Beach resorts in Goa",hotel_search
+[''],"['Here are some popular attractions in Delhi: Red Fort, Qutub Minar, Humayun's Tomb']","What to see in Delhi",tourist_places
+[''],"['The must-visit places in Rajasthan include: Amber Fort, City Palace, Hawa Mahal']","Tourist places in Jaipur",tourist_places
+[''],"['Popular tourist spots in Kerala are: Backwaters, Munnar, Kovalam Beach']","Places to visit in Kerala",tourist_places
+[''],"['Let me check the weather conditions in Mumbai for your planned dates.']","Mumbai weather in June",weather_query
+[''],"['I'll help you understand the best time to visit Kerala based on weather patterns.']","When should I visit Kerala",weather_query
+[''],"['Here's the weather information for Rajasthan during winter: Pleasant days, cold nights, perfect for sightseeing']","Rajasthan winter temperature",weather_query
+[''],"['Here are some popular food options in Delhi: Paranthe Wali Gali, Chandni Chowk street food']","Best street food in Delhi",food_query
+[''],"['You must try these dishes in Hyderabad: Biryani, Haleem, Irani Chai']","Famous food in Hyderabad",food_query
+[''],"['Famous restaurants in Mumbai include: Trishna, Britannia & Co, Swati Snacks']","Where to eat in Mumbai",food_query
+[''],"['The best way to travel in Delhi is: Metro, very convenient and connects most tourist spots']","How to use Delhi Metro",transport_query
+[''],"['Here are the transport options available in Mumbai: Local trains, buses, taxis']","Local transport in Mumbai",transport_query
+[''],"['Let me help you with transportation details for Agra: Prepaid taxis, auto rickshaws available']","Getting around in Agra",transport_query
+[''],"['I recommend booking in advance during peak season (October-March)']","When should I book hotels in Goa",booking_advice
+[''],"['The best time to visit is between October and March when the weather is pleasant']","Best time to visit Rajasthan",travel_advice
+[''],"['You'll need to book tickets in advance for Taj Mahal. Would you like me to help with that?']","Taj Mahal entry tickets",ticket_booking
+[''],"['Popular Kerala packages include: Munnar 2N, Thekkady 1N, Alleppey 1N']","Kerala tour packages",package_query
+[''],"['For Varanasi, I recommend staying near the ghats for the best experience']","Where to stay in Varanasi",accommodation_advice
+[''],"['The Golden Triangle (Delhi-Agra-Jaipur) typically takes 5-6 days']","How many days for Golden Triangle",itinerary_query
