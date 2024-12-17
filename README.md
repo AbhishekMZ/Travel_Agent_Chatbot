@@ -11,7 +11,6 @@ A conversational AI chatbot that helps users find and book flights and hotels fo
 - Error handling and graceful fallbacks
 - Seamless integration between flight and hotel bookings
 - Detailed summaries of travel options
-- Easy conversation reset with 'start over' command
 
 ## Getting Started
 
@@ -40,6 +39,11 @@ source .venv/bin/activate  # On Windows, use: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+4. Install spaCy English language model:
+```bash
+python -m spacy download en_core_web_sm
+```
+
 ### Running the Application
 
 1. Start the Flask server:
@@ -64,8 +68,6 @@ The chatbot follows a structured conversation flow:
 6. **Results**: View available options with prices and details
 7. **Booking**: Contact the travel desk using the provided email for bookings
 
-At any point in the conversation, you can type 'start over' to begin a new search.
-
 ### Example Conversation
 
 ```
@@ -83,23 +85,7 @@ Bot: What would you like to know about?
 User: 1
 Bot: [Shows available flights]
 Would you also like to check hotels? What's your budget per night? (in Rs.)
-
-User: start over
-Bot: Let's start a new search! Where would you like to travel?
 ```
-
-### Start Over Feature
-
-The chatbot includes a convenient "start over" feature that allows users to:
-- Reset the current conversation at any point
-- Clear all previous context and history
-- Start a fresh search immediately
-- Maintain a clean state for accurate recommendations
-
-You can trigger this feature by typing:
-- "start over"
-- "restart"
-- "new search"
 
 ## Project Structure
 
