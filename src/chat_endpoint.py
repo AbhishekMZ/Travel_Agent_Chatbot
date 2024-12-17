@@ -1,3 +1,4 @@
+"""Chat endpoint for the Travel Chatbot"""
 import spacy
 from typing import Dict, Any, List
 from .flight_service import FlightService
@@ -10,7 +11,12 @@ class TravelChatbot:
         self.flight_service = FlightService()
         self.hotel_recommender = HotelRecommender()
         self.history = ChatHistory()
-        self.greetings = {'hi', 'hello', 'hey', 'good morning', 'namaste'}
+        self.greetings = {
+            'hi', 'hello', 'hey', 'good morning', 'good afternoon', 
+            'good evening', 'namaste', 'hola', 'greetings', 'howdy',
+            'hi there', 'hello there', 'start', 'begin'
+        }
+        self.valid_cities = {'mumbai', 'delhi', 'bangalore', 'hyderabad', 'chennai', 'kolkata', 'jaipur', 'agra', 'varanasi'}
 
     def process_message(self, message: str) -> str:
         """Process user message and return appropriate response"""
@@ -21,27 +27,39 @@ class TravelChatbot:
         # Handle greetings
         if self.history.current_context.get('pending_info') is None:
             self.history.reset()
-            self.history.current_context['pending_info'] = 'destination'
+            self.history.current_context['pending_info'] = 'origin'
             
-            if any(greeting in message.lower() for greeting in ['hi', 'hello', 'hey', 'good morning', 'namaste']):
-                return "Hello! Where would you like to travel?"
-            return "I'm not sure what you mean. Please say hi to start a conversation or 'start over' to begin a new search."
+            message_lower = message.lower().strip()
+            if any(greeting in message_lower for greeting in self.greetings):
+                return "Hello! I'm your travel assistant. I can help you book flights and find hotels. Which city are you traveling from?"
+            return "Hi! To get started with planning your trip, please let me know which city you're traveling from."
         
-        # Handle destination
+        # Handle origin city
+        if self.history.current_context.get('pending_info') == 'origin':
+            if message.lower() in self.valid_cities:
+                self.history.current_context['origin'] = message.lower()
+                self.history.current_context['pending_info'] = 'destination'
+                return "Great! And which city would you like to travel to?"
+            return f"I'm not sure what you mean. Please enter a valid city ({', '.join(sorted(self.valid_cities))})."
+        
+        # Handle destination city
         if self.history.current_context.get('pending_info') == 'destination':
-            if message.lower() in ['mumbai', 'delhi', 'bangalore']:
+            if message.lower() in self.valid_cities:
+                if message.lower() == self.history.current_context.get('origin'):
+                    return "The destination city cannot be the same as your origin city. Please choose a different city."
                 self.history.current_context['destination'] = message.lower()
                 self.history.current_context['pending_info'] = 'date'
-                return "Great! When would you like to travel?"
-            return "I'm not sure what you mean. Please enter a valid city (Mumbai, Delhi, or Bangalore) or type 'start over' to begin a new search."
+                return "Perfect! When would you like to travel?"
+            return f"I'm not sure what you mean. Please enter a valid city ({', '.join(sorted(self.valid_cities))})."
         
         # Handle date
         if self.history.current_context.get('pending_info') == 'date':
-            if any(date in message.lower() for date in ['next week', 'tomorrow', '25th december']):
+            if any(date in message.lower() for date in ['next week',  'tomorrow',  '25th december',  'day after tomorrow',  'next monday',  'this friday',  'this weekend',  '1st january',  '15th august',  'in two days',  'in three weeks',  
+                    'after 5 days',  'next month',  'next fortnight',  'this saturday',  'this sunday',  'coming friday',  'end of this week',  'early january',  'late february',  '4th july',  '31st march',  '14/02/2024',  '03/03/2024',  '2024-04-10',  '30-12-2024',  '2024/07/25']):
                 self.history.current_context['date'] = message
                 self.history.current_context['pending_info'] = 'menu'
                 return "What would you like to know about?\n1. Flights\n2. Hotels"
-            return "I'm not sure what you mean. Please enter a valid date or type 'start over' to begin a new search."
+            return "I'm not sure what you mean. Please enter a valid date."
         
         # Handle menu selection
         if self.history.current_context.get('pending_info') == 'menu':
@@ -50,22 +68,23 @@ class TravelChatbot:
                 return "What's your budget per night for the hotel? (in Rs.)"
             elif message.lower() in ['1', 'flights', 'flight']:
                 flights = self.flight_service.get_flights(
+                    self.history.current_context['origin'],
                     self.history.current_context['destination'],
                     self.history.current_context['date']
                 )
                 if not flights:
-                    return "Sorry, no flights found for your criteria. Type 'start over' to begin a new search with different dates or destinations."
+                    return f"Sorry, no flights found from {self.history.current_context['origin'].title()} to {self.history.current_context['destination'].title()}. Please try different cities."
                 
-                flight_response = "Available flights:\n" + "\n".join(
+                flight_response = f"Available flights from {self.history.current_context['origin'].title()} to {self.history.current_context['destination'].title()}:\n" + "\n".join(
                     f"- {flight['airline']}: Duration {flight['duration']}, Price Rs. {flight['price']}"
                     for flight in flights
                 )
                 
                 # Set context to budget to prompt for hotel recommendations
                 self.history.current_context['pending_info'] = 'budget'
-                return flight_response + "\n\nWould you also like to check hotels? What's your budget per night? (in Rs.)"
+                return flight_response + "\n\nWould you also like to check hotels at your destination? What's your budget per night? (in Rs.)"
             return "Please choose either 1 for Flights or 2 for Hotels."
-            
+        
         # Handle hotel budget
         if self.history.current_context.get('pending_info') == 'budget':
             try:
@@ -77,6 +96,7 @@ class TravelChatbot:
                 )
                 
                 # Store current context before resetting
+                origin = self.history.current_context.get('origin', '')
                 destination = self.history.current_context.get('destination', '')
                 date = self.history.current_context.get('date', '')
                 
@@ -112,10 +132,11 @@ class TravelChatbot:
         # Default response for unexpected messages
         return "I'm not sure what you mean. Type 'start over' to begin a new search."
 
-    def _handle_conclusion(self, destination: str, date: str) -> str:
+    def _handle_conclusion(self, origin: str, destination: str, date: str) -> str:
         """Generate a conclusion message for the conversation"""
         return (
             f"Thank you for using our travel chatbot! Here's a summary of your search:\n"
+            f"- Origin: {origin.capitalize()}\n"
             f"- Destination: {destination.capitalize()}\n"
             f"- Travel Date: {date}\n\n"
             "You can book any of the shown options by contacting our travel desk at booking@travelagency.com.\n"
@@ -128,8 +149,7 @@ class TravelChatbot:
 
     def _is_valid_city(self, city: str) -> bool:
         """Check if city is valid"""
-        valid_cities = {'mumbai', 'delhi', 'bangalore', 'hyderabad', 'chennai', 'kolkata'}
-        return city.lower() in valid_cities
+        return city.lower() in self.valid_cities
 
     def _is_valid_date(self, date: str) -> bool:
         """Check if date is valid"""
@@ -153,12 +173,13 @@ class TravelChatbot:
         # Handle flights
         if message in {'1', 'flights', 'flight'}:
             flights = self.flight_service.get_flights(
+                self.history.current_context['origin'],
                 self.history.current_context['destination'],
                 self.history.current_context['date']
             )
             if not flights:
-                return "Sorry, no flights found for your criteria. Please try different dates or destinations."
-            return "Available flights:\n" + "\n".join(
+                return f"Sorry, no flights found from {self.history.current_context['origin'].title()} to {self.history.current_context['destination'].title()}. Please try different cities."
+            return f"Available flights from {self.history.current_context['origin'].title()} to {self.history.current_context['destination'].title()}:\n" + "\n".join(
                 f"- {flight['airline']}: Duration {flight['duration']}, Price Rs. {flight['price']}"
                 for flight in flights
             )
@@ -197,7 +218,7 @@ def get_response(text: str) -> str:
 
 if __name__ == "__main__":
     chatbot = TravelChatbot()
-    print("Bot: Hello! I'm your travel assistant. Where would you like to travel?")
+    print("Bot: Hello! I'm your travel assistant. Which city are you traveling from?")
     
     while True:
         user_input = input("You: ")

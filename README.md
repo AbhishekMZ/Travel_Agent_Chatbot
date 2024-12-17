@@ -61,7 +61,16 @@ http://localhost:5000
 The chatbot follows a structured conversation flow:
 
 1. **Greeting**: Start with a simple greeting (hi, hello, hey, etc.)
-2. **Destination**: Enter your desired city (currently supports Mumbai, Delhi, Bangalore)
+2. **Destination**: Enter your desired city (supports the following cities):
+   - Delhi (DEL) - Indira Gandhi International Airport
+   - Mumbai (BOM) - Chhatrapati Shivaji Maharaj International Airport
+   - Bangalore (BLR) - Kempegowda International Airport
+   - Hyderabad (HYD) - Rajiv Gandhi International Airport
+   - Chennai (MAA) - Chennai International Airport
+   - Kolkata (CCU) - Netaji Subhas Chandra Bose International Airport
+   - Jaipur (JAI) - Jaipur International Airport
+   - Agra (AGR) - Agra Airport
+   - Varanasi (VNS) - Lal Bahadur Shastri International Airport
 3. **Travel Date**: Specify when you want to travel
 4. **Service Selection**: Choose between flights (1) or hotels (2)
 5. **Budget**: For hotels, specify your per-night budget in Rs.
